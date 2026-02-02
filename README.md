@@ -3,7 +3,12 @@
 ![GitHub License](https://img.shields.io/github/license/kreier/homeserver)
 ![GitHub Release](https://img.shields.io/github/v/release/kreier/homeserver)
 
-Documentation on my journey to a little homelab.
+Documentation on my journey to a little homelab. It currently consist of 2 routers, 1 managed switch, 3 always running servers and one LLM server that can be activated on demand:
+
+- LLM server [server.home](#serverhome) with 22 GB GDDR5 on demand
+- Raspberry Pi 4 [pi4.home](#pi4home-for-home-assistant-and-dns) for Home Assistant, DNS Resolver and filter
+- Raspberry Pi 3 [pi3.home](#pi3home-for-home-assistant-and-pihole-in-secondary-network)
+- [History](#history)
 
 ## server.home
 
@@ -22,6 +27,8 @@ This machine runs only when started manually, and is switched off most of the ti
 ![nvtop 3x GPU](docs/2026-01-27nvtop.jpeg)
 
 ### Software
+
+<img src="docs/2026-02-02z170classified.jpg" width="25%" align="right">
 
 As stable foundation until April 2029, and with Ubuntu Pro (ESM) until April 2034 this should be enough time to just keep this system running. Almost all other modules run in a docker container. With a fixed IP 10.10.10.40 the services get their own subdomains of server.home. It is routed with a Raspberry Pi 1B in the same network, using pihole.
 
@@ -77,10 +84,55 @@ Technically it is an i5-8500T processor inside the HP EliteDesk mini 800 G4 with
 ### Hardware
 
 - i5-8500T
+- 32 GB DDR4 2400 MT/s with 
 - NVMe PCIe 4.0 x4 512 GB
 - USB Network 2.5 GB
 
-## pi4.home for home automation and DNS
+### Software
+
+There was a lot to learn about the several layers of abstraction. Here is a little table as visual vertical block:
+
+| Level | Layer | Component | Function |
+| :--- | :--- | :--- | :--- |
+| **0** | **Physical** | HP EliteDesk 800 G4 (i5-8500T) | The "Bare Metal" hardware and raw silicon. |
+| **1** | **Hypervisor** | Proxmox VE | Type-1 Hypervisor managing hardware resources. |
+| **2** | **Virtual OS** | Ubuntu 24.04.3 LTS | The Guest VM with its own kernel and file system. |
+| **3** | **Container Engine** | Docker & Docker Compose | The runtime that isolates apps from the OS. |
+| **4** | **Routing** | Traefik | The "Front Door" that handles SSL and traffic. |
+| **5** | **Applications** | WordPress, Ollama, Home Assistant | The specific services providing data and logic. |
+
+With the UHD 630 we can even use the GPU to support ollama: You will need to "Pass-through" the GPU device from Proxmox (Level 2) $\rightarrow$ Ubuntu (Level 3) $\rightarrow$ Docker (Level 4) so that Ollama (Level 5) can use it.
+
+## pi4.home for Home Assistant and DNS
 
 Just with the router from Asus it's not possible to have subdomains for the server to access the different services. Traefik is forwarding incoming requests to the right container, but getting a DNS entry is another question. With Pihole I also get a great AD blocker. Its surprizing that about 25% of all DNS requests have to be blocked!
 
+## pi3.home for Home Assistant and Pihole in secondary network
+
+The network for gadgets and devices I don't know a lot about.
+
+## History
+
+### 2024
+
+I started to build my own LLM server, and I knew already that I need a lot of RAM and processing power. So I got a used Xeon E5-2696v3 18C/36T and 128 GB ECC RAM. It fit's larger models like the llama3.1:70b but comes to a crawl of only 0.2 token/s since I only have [8.27 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth. The i5-8500 would probably get 34 GB/s and speed up to 1 token/s.
+
+### 2025
+
+GPUs do not only posess a lot of parallel compute power (important for the initial PP - prompt processing for an LLM task) but usually also have a fast memory. My P104-100 for example has [314 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth for the 8 GB of GDDR5X RAM, that's 38x faster than the DDR3 ECC RAM. Which would result in ca. 7.6 token/s for the [llama3.1:70b model](https://ollama.com/library/llama3.1) in 4bit quantization, requiring 43 GB (that I don't have). And since the GPUs require a lot of power, they also get hot. My Z170 would support 4 graphics cards, but 2 slots is actually rather narrow for GPU's:
+
+<img src="docs/2025-01_server.jpg" width="39%"> <img src="docs/2025-01_server_display.jpg" width="59%">
+
+The GTX 1060 has a broken HDMI port, but I still can use the 3 DP to connect a display. So I moved it to my E3-1226 v3 machine. I lost 6 GB VRAM of the combined 26 GB. Then one P106-100 broke, so I replaced it with a P104-100. More memory, and much faster! Now 2 GB more and with 320 GB/s bandwidth. That's the machine now running. The theoretical power consupmtion of the three GPUs is 180W + 150W + 120W = 420W but in reality during inference and prompt processing they only use 150W.
+
+### 2026
+
+With more time in training models the available modesl also get significantly better. Now I can use a [19GB glm-4.7-flash](https://ollama.com/library/glm-4.7-flash) that DOES fit into the 22 GB VRAM, distributed over my 3 GPUs (all 47 layers). The speed should now be 17.2 token/s if we use a linear approach (or 12 resp. 10 for the slower 1070 and P106). Effectively I get 23 token/s in Open WebUI, probably due to being a MoE model to effectively double the speed again (see my insight on [speculative execution](https://kreier.github.io/ml/#faster-inference-with-speculative-execution) from 2024-11-27)
+
+I get 23 token/s instead of theoretically only 7.6 token on llama3.1:70b (3x as fast) while also getting a similar or better result:
+
+| Benchmark                | Llama 3.1 70B (Instruct) | GLM-4.7-Flash | Winner        |
+|--------------------------|--------------------------|---------------|---------------|
+| MMLU (General Knowledge) | ~84.0% (5-shot)          | ~81.2%        | Llama 3.1 70B |
+| GSM8K (Math Reasoning)   | ~94.8%                   | ~89.5%        | Llama 3.1 70B |
+| HumanEval (Coding)       | ~79.3%                   | ~82.4%        | GLM-4.7-Flash |
