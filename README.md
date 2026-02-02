@@ -9,14 +9,17 @@ Documentation on my journey to a little homelab.
 
 This machine runs only when started manually, and is switched off most of the time. It's more a playground to see what's possible with local LLMs due to its 3 GPUs and 22 GB of fast VRAM. Other specifications:
 
-- i3-6100
-- EVGA Z170 Confidential motherboard with Quad-SLI
+- Intel [i3-6100](https://www.intel.com/content/www/us/en/products/sku/90729/intel-core-i36100-processor-3m-cache-3-70-ghz/specifications.html) 2C/4T 3.7 GHz Skylake
+- EVGA [Z170 Classified](https://www.evga.com/support/manuals/files/151-SS-E179.pdf) motherboard with Quad-SLI, 6 PCIe slots
 - RAM: 32 GB DDR4 2400 (early 2026 reduced to 16 GB)
 - GPU: all NVIDIA
-  - GTX 1070 8GB GDDR5
-  - P104-100 8GB GDDR5
+  - P104-100 8GB GDDR5X [314 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 5005 MHz
+  - GTX 1070 8GB GDDR5  [220 GB/s](https://kreier.github.io/benchmark/gpu/) 3802 MHz
+  - P104-100 6GB GDDR5  [176 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 4006 MHz
 - NVMe: 256 Toshiba PCIe 4.0 x4
 - SSD: 240 Kingston SATA3 for the models of LLM used by Ollama
+
+![nvtop 3x GPU](docs/2026-01-27nvtop.jpeg)
 
 ### Software
 
@@ -32,7 +35,9 @@ As stable foundation until April 2029, and with Ubuntu Pro (ESM) until April 203
   - hofkoh.server.home to have an image of the old **hofkoh.de**
   - saihtorg.server.home to have an image of the old **saiht.org**
  
-Over SSH I can see some details with btop and nvtop about the systems stage.
+Over SSH I can see some details with btop and nvtop about the systems stage. And OpenWebUI renders a beautiful LLM interface that allows to upload documents and rendered LaTeX output, structured text and tables
+
+![OpenWebUI output](docs/2026-01-27openWebUI.jpeg)
 
 ### Docker
 
@@ -74,3 +79,8 @@ Technically it is an i5-8500T processor inside the HP EliteDesk mini 800 G4 with
 - i5-8500T
 - NVMe PCIe 4.0 x4 512 GB
 - USB Network 2.5 GB
+
+## pi4.home for home automation and DNS
+
+Just with the router from Asus it's not possible to have subdomains for the server to access the different services. Traefik is forwarding incoming requests to the right container, but getting a DNS entry is another question. With Pihole I also get a great AD blocker. Its surprizing that about 25% of all DNS requests have to be blocked!
+
