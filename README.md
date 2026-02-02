@@ -18,9 +18,9 @@ This machine runs only when started manually, and is switched off most of the ti
 - EVGA [Z170 Classified](https://www.evga.com/support/manuals/files/151-SS-E179.pdf) motherboard with Quad-SLI, 6 PCIe slots
 - RAM: 32 GB DDR4 2400 (early 2026 reduced to 16 GB)
 - GPU: all NVIDIA
-  - P104-100 8GB GDDR5X [314 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 5005 MHz
-  - GTX 1070 8GB GDDR5  [220 GB/s](https://kreier.github.io/benchmark/gpu/) 3802 MHz
-  - P104-100 6GB GDDR5  [176 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 4006 MHz
+  - P104-100 8GB GDDR5X [314 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 5005 MHz PCIe 1.0 x4
+  - GTX 1070 8GB GDDR5  [220 GB/s](https://kreier.github.io/benchmark/gpu/) 3802 MHz PCIe 3.0 x16
+  - P106-100 6GB GDDR5  [176 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 4006 MHz PCIe 1.0 x16
 - NVMe: 256 Toshiba PCIe 4.0 x4
 - SSD: 240 Kingston SATA3 for the models of LLM used by Ollama
 
@@ -115,24 +115,51 @@ The network for gadgets and devices I don't know a lot about.
 
 ### 2024
 
-I started to build my own LLM server, and I knew already that I need a lot of RAM and processing power. So I got a used Xeon E5-2696v3 18C/36T and 128 GB ECC RAM. It fit's larger models like the llama3.1:70b but comes to a crawl of only 0.2 token/s since I only have [8.27 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth. The i5-8500 would probably get 34 GB/s and speed up to 1 token/s.
+I started to build my own LLM server, and I knew already that I need a lot of RAM and processing power. So I got a used [Xeon E5-2696v3](https://www.techpowerup.com/cpu-specs/xeon-e5-2696-v3.c2903) 18C/36T and 128 GB ECC RAM. It fit's larger models like the llama3.1:70b but comes to a crawl of **only 0.2 token/s** since I only have [8.27 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth. The i5-8500 would probably get 34 GB/s and speed up to 1 token/s.
+
+**In 2026** I realized that there must be a glitch. The model stated above was the llama3.1:70b with 4 bit quantization. The download is 39 GB, and it used 42 GB RAM with ollama. The smaller llama3.1:70b-instruct-q3_K_M is only 34 GB in download and uses 38 GB RAM. Yet here I get a much faster 0.83 token/s speed. Assuming linear dependency on model size and memory speed this aligns with all other measurements (30GB, 19GB, 12GB, 8GB) of the E5-2696 v3. The comparison below should therefore assume 0.74 as reference, 4.6x faster and relating to 38 GB/s memory speed. Being quad-channel of up to 68 GB/s this is more in line with the expectation. The P104-100 would still be 10x faster!
 
 ### 2025
 
-GPUs do not only posess a lot of parallel compute power (important for the initial PP - prompt processing for an LLM task) but usually also have a fast memory. My P104-100 for example has [314 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth for the 8 GB of GDDR5X RAM, that's 38x faster than the DDR3 ECC RAM. Which would result in ca. 7.6 token/s for the [llama3.1:70b model](https://ollama.com/library/llama3.1) in 4bit quantization, requiring 43 GB (that I don't have). And since the GPUs require a lot of power, they also get hot. My Z170 would support 4 graphics cards, but 2 slots is actually rather narrow for GPU's:
+GPUs do not only posess a lot of parallel compute power (important for the initial **PP** - prompt processing for an LLM task) but usually also have a fast memory. My P104-100 for example has [314 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth for the 8 GB of GDDR5X RAM, that's 38x faster than the DDR3 ECC RAM. Which would result in ca. 7.6 token/s for the [llama3.1:70b model](https://ollama.com/library/llama3.1) in 4bit quantization, requiring 43 GB (that I don't have). And since the GPUs require a lot of power, they also get hot. My Z170 would support 4 graphics cards, but using only 2 slots per GPU is actually rather narrow. It is better to have one slot empty space for airflow between them. But then you can only fit 3 GPUs on the motherboard:
 
-<img src="docs/2025-01_server.jpg" width="39%"> <img src="docs/2025-01_server_display.jpg" width="59%">
+<img src="docs/2025-01_server_display.jpg" width="39%"> <img src="docs/2025-01_server.jpg" width="59%">
 
-The GTX 1060 has a broken HDMI port, but I still can use the 3 DP to connect a display. So I moved it to my E3-1226 v3 machine. I lost 6 GB VRAM of the combined 26 GB. Then one P106-100 broke, so I replaced it with a P104-100. More memory, and much faster! Now 2 GB more and with 320 GB/s bandwidth. That's the machine now running. The theoretical power consupmtion of the three GPUs is 180W + 150W + 120W = 420W but in reality during inference and prompt processing they only use 150W.
+The GTX 1060 has a broken HDMI port, but I still can use the 3 DP to connect a display. So I moved it to my E3-1226 v3 machine. I lost 6 GB VRAM of the combined 26 GB. Then one P106-100 broke, so I replaced it with a P104-100. **More memory**, and much **faster**! Now 2 GB more and with 320 GB/s bandwidth. That is the machine that is now running. The theoretical power consupmtion of the three GPUs is 180W + 150W + 120W = 450W but in reality during inference and prompt processing they only use 150W.
+
+| GPU      | power old | power new | GB/s |
+|----------|:-----:|:-----:|:----:|
+| 3060 Ti  |  200  |       |  448 |
+| P106-100 |  120  |  120  |  192 |
+| P106-100 |  120  |       |  192 |
+| GTX 1060 |  120  |       |  192 |
+| GTX 1070 |       |  150  |  256 |
+| P104-100 |       |  180  |  320 |
+| total    |  560  |  450  |      |
 
 ### 2026
 
-With more time in training models the available modesl also get significantly better. Now I can use a [19GB glm-4.7-flash](https://ollama.com/library/glm-4.7-flash) that DOES fit into the 22 GB VRAM, distributed over my 3 GPUs (all 47 layers). The speed should now be 17.2 token/s if we use a linear approach (or 12 resp. 10 for the slower 1070 and P106). Effectively I get 23 token/s in Open WebUI, probably due to being a MoE model to effectively double the speed again (see my insight on [speculative execution](https://kreier.github.io/ml/#faster-inference-with-speculative-execution) from 2024-11-27)
+With more time in training models the available modesl also get significantly better. Now I can use a [19GB glm-4.7-flash](https://ollama.com/library/glm-4.7-flash) that DOES fit into the **22 GB VRAM,** distributed over my 3 GPUs (all 47 layers). The speed should now be 17.2 token/s if we use a linear approach (or 12 resp. 10 for the slower 1070 and P106). Effectively I get 23 token/s in Open WebUI, probably due to being a MoE model to effectively double the speed again (see my insight on [speculative execution](https://kreier.github.io/ml/#faster-inference-with-speculative-execution) from 2024-11-27)
 
-I get 23 token/s instead of theoretically only 7.6 token on llama3.1:70b (3x as fast) while also getting a similar or better result:
+Now I finally have a usable system. I get **23 token/s** instead of theoretically only 7.6 token on llama3.1:70b (3x as fast) while also getting a similar or better result:
 
 | Benchmark                | Llama 3.1 70B (Instruct) | GLM-4.7-Flash | Winner        |
 |--------------------------|--------------------------|---------------|---------------|
 | MMLU (General Knowledge) | ~84.0% (5-shot)          | ~81.2%        | Llama 3.1 70B |
 | GSM8K (Math Reasoning)   | ~94.8%                   | ~89.5%        | Llama 3.1 70B |
 | HumanEval (Coding)       | ~79.3%                   | ~82.4%        | GLM-4.7-Flash |
+
+There are a few models that fit into the 22 GB:
+
+- 19 GB [glm-4.7-flash](https://ollama.com/library/glm-4.7-flash) with MoE and reasoning
+- 17 GB [translategemma:27b](https://ollama.com/library/translategemma) for 55 languages, maybe [timeline project](https://github.com/kreier/timeline)?
+- 20 GB [qwen3-vl:30b](https://ollama.com/library/qwen3-vl) vision-language model in the Qwen family
+
+A short chat wit Gemini revealed that to fully use the context window of 198K one need 40.5 GB VRAM, even though the model weights are only 15 GB. That's because the KV Cache needs 0.12 GB per 1k tokens in the MLA architecture. Maybe I should investigate that with a few longer text documents, since my available VRAM has been reduced by 4 GB in 2026, while also reducing the power consumption from 560W to 450W. The last GPU was only connected PCIe 1.0 x1 anyway (0.25 GB/s vs. 16 GB/s for 3.0 x16).
+
+| year |    GPU   |  RAM  | GB/s |
+|:----:|:--------:|:-----:|:----:|
+| 2023 |    M1    |  8 GB |   68 |
+| 2024 |  3070 Ti |  8 GB |  608 |
+| 2025 | P106-100 | 26 GB |  192 |
+| 2026 | P104-100 | 22 GB |  320 |
