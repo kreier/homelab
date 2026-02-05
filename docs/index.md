@@ -16,6 +16,23 @@ Documentation on my journey to a small but capable homelab. The setup currently 
 ## :material-layers-outline: Infrastructure at a Glance
 
 * **[:material-server-network: server.home](./machines/server-hardware.md)**: The LLM playground with triple NVIDIA GPUs.
-* **[:material-microchip: 8500.home](./machines/8500-hardware.md)**: The energy-efficient HP EliteDesk mini (4W idle).
+* **[:material-chip: 8500.home](./machines/8500-hardware.md)**: The energy-efficient HP EliteDesk mini (4W idle).
 * **[:material-raspberry-pi: pi4.home](./machines/pi4.md)**: Network backbone for Home Assistant and DNS.
 * **[:material-lan: pi3.home](./machines/pi3.md)**: Secondary network management.
+
+# :material-home-automation: Home
+
+Welcome to the documentation for the Kreier Homelab. Use the menu on the left to navigate through the hardware specifications and software stacks of each node.
+
+## :material-server-network: Quick Links
+
+- **[:material-tools: Setup Guide](./setup.md)**: Configuration and Docker basics.
+- **[:material-gpu: server.home](./machines/server-hardware.md)**: Details on the 22GB VRAM LLM cluster.
+- **[:material-microchip: 8500.home](./machines/8500-hardware.md)**: The energy-efficient Proxmox node.
+- **[:material-history: History](./history.md)**: Benchmarks and the evolution of the lab.
+
+---
+### Current Lab Architecture
+
+!!! info "Navigation Tip"
+    In the sidebar to the left, click on **Servers** to expand the specific details for `server.home` and `8500.home`.
