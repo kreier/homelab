@@ -26,11 +26,11 @@ This machine runs only when started manually, and is switched off most of the ti
 
 This image shows the 47 layers of [glm-4.7-flash](https://ollama.com/library/glm-4.7-flash):q4_K_M using 19 of the 22 GB VRAM. Each GPU has about 1 GB headroom for the K-V-pairs related to their layers when doing inference over longer context. An update of the tested maximum context length follows. 2026-02-05
 
-![nvtop 3x GPU](docs/2026-01-27nvtop.jpeg)
+![nvtop 3x GPU](assets/2026-01-27nvtop.jpeg)
 
 ### Software
 
-<img src="docs/2026-02-02z170classified.jpg" width="25%" align="right">
+<img src="assets/2026-02-02z170classified.jpg" width="25%" align="right">
 
 As stable foundation until April 2029, and with Ubuntu Pro (ESM) until April 2034 this should be enough time to just keep this system running. Almost all other modules run in a docker container. With a fixed IP 10.10.10.40 the services get their own subdomains of server.home. It is routed with a Raspberry Pi 1B in the same network, using pihole.
 
@@ -46,7 +46,7 @@ As stable foundation until April 2029, and with Ubuntu Pro (ESM) until April 203
  
 Over SSH I can see some details with btop and nvtop about the systems stage. And OpenWebUI renders a beautiful LLM interface that allows to upload documents and rendered LaTeX output, structured text and tables
 
-![OpenWebUI output](docs/2026-01-27openWebUI.jpeg)
+![OpenWebUI output](assets/2026-01-27openWebUI.jpeg)
 
 ### Docker
 
@@ -146,7 +146,7 @@ I started to build my own LLM server, and I knew already that I need a lot of RA
 
 GPUs do not only posess a lot of parallel compute power (important for the initial **PP** - prompt processing for an LLM task) but usually also have a fast memory. My P104-100 for example has [314 GB/s](https://github.com/kreier/benchmark/tree/main/gpu/opencl) memory bandwidth for the 8 GB of GDDR5X RAM, that's 38x faster than the DDR3 ECC RAM. Which would result in ca. 7.6 token/s for the [llama3.1:70b model](https://ollama.com/library/llama3.1) in 4bit quantization, requiring 43 GB (that I don't have). And since the GPUs require a lot of power, they also get hot. My Z170 would support 4 graphics cards, but using only 2 slots per GPU is actually rather narrow. It is better to have one slot empty space for airflow between them. But then you can only fit 3 GPUs on the motherboard:
 
-<img src="docs/2025-01_server_display.jpg" width="39%"> <img src="docs/2025-01_server.jpg" width="59%">
+<img src="assets/2025-01_server_display.jpg" width="39%"> <img src="assets/2025-01_server.jpg" width="59%">
 
 The GTX 1060 has a broken HDMI port, but I still can use the 3 DP to connect a display. So I moved it to my E3-1226 v3 machine. I lost 6 GB VRAM of the combined 26 GB. Then one P106-100 broke, so I replaced it with a P104-100. **More memory**, and much **faster**! Now 2 GB more and with 320 GB/s bandwidth. That is the machine that is now running. The theoretical power consupmtion of the three GPUs is 180W + 150W + 120W = 450W but in reality during inference and prompt processing they only use 150W.
 
