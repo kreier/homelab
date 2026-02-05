@@ -3,11 +3,14 @@
 This guide covers the core operations for managing the containerized services across the homelab.
 
 ## :material-folder-network: Project Structure
+
 Organize your services by creating a dedicated subfolder for each container within a central directory:
+
 * **Directory**: `~/docker/`
 * **Example**: `~/docker/wordpress/docker-compose.yml`
 
 ## :material-docker: Docker Workflow
+
 Use these standard commands to manage your service stacks:
 
 | Action | Command |
@@ -27,3 +30,4 @@ docker network create my_network
 
 # List existing networks
 docker network ls
+```
