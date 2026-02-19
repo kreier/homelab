@@ -6,10 +6,10 @@ The system runs on **Ubuntu 24.04 LTS** with support (ESM) until 2034.
 
 We use `nvtop` to monitor the load across all three GPUs and **Open WebUI** as the primary interface for LLM interaction.
 
-![nvtop Monitor](../assets/2026-01-27nvtop.jpeg)
+![nvtop Monitor](../../assets/2026-01-27nvtop.jpeg)
 *Real-time monitoring of the 3x GPU cluster.*
 
-![Open WebUI Interface](../assets/2026-01-27openWebUI.jpeg)
+![Open WebUI Interface](../../assets/2026-01-27openWebUI.jpeg)
 *Custom Open WebUI instance running locally.*
 
 ## :material-docker: Service Stack

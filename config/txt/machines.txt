@@ -1,0 +1,25 @@
+VNPT 
+192.168.18.1
+
+Experiment 
+10.1.1.1 Totolink or H3C Magic RT3000
+
+
+
+IOT 
+10.1.1.1 TL-WR1043ND 16/64 on its last leg
+10.1.1.3 Raspberry Pi3 with 1 GB
+10.1.1.5 Jetson Nano with 4 GB
+10.1.1.2 i5-8500T for proxmox, docker, ollama, open webUI, openClaw, 
+
+
+Safe haven
+10.10.10.1 Asus RT-AX55
+10.10.10.4 RPi4 for pihole and more
+10.10.10.10 ds216
+10.10.10.19/wake picow.home to wake up Penta
+10.10.10.20 brother printer
+10.10.10.30 i7-13700T workhorse
+10.10.10.40 server.home Penta-GPU
+10.10.10.41 Tuya smartplug.home
+10.10.10.50 i7-8700 8700.home for vPro and MeshCommander

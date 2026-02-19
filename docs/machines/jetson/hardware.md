@@ -4,7 +4,7 @@ This machine is a playground for local LLMs, utilizing 3 GPUs to achieve 22 GB o
 
 ## :material-view-quilt: Physical Build
 
-![Server Front](../assets/2025-01_server.jpg){ width="59.2%" } ![Server Internal](../assets/2025-01_server_display.jpg){ width="39.3%" }
+![Server Front](../../assets/2025-01_server.jpg){ width="59.2%" } ![Server Internal](../../assets/2025-01_server_display.jpg){ width="39.3%" }
 *Left: The server enclosure. Right: Internal display showing system stats.*
 
 <!-- <div class="grid cards" markdown>
@@ -27,7 +27,7 @@ This machine is a playground for local LLMs, utilizing 3 GPUs to achieve 22 GB o
 | :material-memory: **RAM** | 16 GB DDR4 2400 (Reduced early 2026) |
 | :material-harddisk: **Storage** | 256GB NVMe + 240GB SATA SSD for Ollama |
 
-![EVGA Z170](../assets/2026-02-02z170classified.jpg)
+![EVGA Z170](../../assets/2026-02-02z170classified.jpg)
 *The EVGA Z170 Classified motherboard supporting 4-way GPU configurations.*
 
 
@@ -50,9 +50,11 @@ Before the current optimization, the system ran a 4-GPU cluster to maximize VRAM
 The current setup focuses on balancing thermal overhead and consistent VRAM speeds:
 
 1.  **P104-100 (8GB GDDR5X)**: :material-speedometer: 314 GB/s
-2.  **GTX 1070 (8GB GDDR5)**: :material-speedometer: 220 GB/s
-3.  **P106-100 (6GB GDDR5)**: :material-speedometer: 176 GB/s
+2.  **GTX 1070 (8GB GDDR5)**:  :material-speedometer: 220 GB/s
+3.  **P104-100 (8GB GDDR5X)**: :material-speedometer: 314 GB/s
+4.  **P106-100 (6GB GDDR5)**:  :material-speedometer: 176 GB/s
+
 
 This rocks! All 47 layers in the GPUs, each with 1 GB space for local K-V values.
 
-![nvtop output](../assets/2026-01-27nvtop.jpeg)
+![nvtop output](../../assets/2026-01-27nvtop.jpeg)

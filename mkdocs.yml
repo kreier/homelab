@@ -30,6 +30,7 @@ theme:
 
 plugins:
   - search
+  - glightbox
 
 markdown_extensions:
   - attr_list
@@ -45,13 +46,27 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Setup: setup.md
-  - Servers:
-    - server.home:
-      - Hardware: machines/server-hardware.md
-      - Software: machines/server-software.md
-    - 8500.home:
-      - Hardware: machines/8500-hardware.md
-      - Software: machines/8500-software.md
-    - pi4.home: machines/pi4.md
-    - pi3.home: machines/pi3.md  
+  - Machines: 
+    - Overview: machines/index.md
+    - Penta-GPU server:
+      - Hardware: machines/server/hardware.md
+      - Software: machines/server/software.md
+    - i5-8500T:
+      - Hardware: machines/8500/hardware.md
+      - Software: machines/8500/software.md
+    - Nvidia Jetson Nano:
+      - Hardware: machines/jetson/hardware.md
+      - Software: machines/jetson/software.md
+    - Other devices:
+      - Raspberry Pi 4: machines/pi4.md
+      - Raspberry Pi 4: machines/pi3.md
+      - Rockchip rk3229: machines/rk3229.md
+  - Networks:
+    - Overview: network/index.md
+    - Home Network: network/home.md
+  - Services:
+    - Home Assistant: services/home-assistant.md
+    - Automation n8n: services/n8n.md
+    - Pi-hole: services/pihole.md
   - History: history.md
+  - Legacy: legacy.md
