@@ -1,16 +1,16 @@
-# Homeserver
+# Homelab
 
 ![GitHub License](https://img.shields.io/github/license/kreier/homeserver)
 ![GitHub Release](https://img.shields.io/github/v/release/kreier/homeserver)
 
-Documentation on my journey to a little homelab. It currently consist of 2 routers, 1 managed switch, 3 always running servers and one LLM server that can be activated on demand:
+Documentation on my journey to a little homelab. It currently consist of 3 routers, 1 managed switch, 3 always running servers and one LLM server that can be activated on demand:
 
-- LLM server [server.home](#serverhome) with 22 GB GDDR5 on demand
+- LLM server [llm.server.home](#serverhome) with 30 GB GDDR5 on demand
 - Raspberry Pi 4 [pi4.home](#pi4home-for-home-assistant-and-dns) for Home Assistant, DNS Resolver and filter
 - Raspberry Pi 3 [pi3.home](#pi3home-for-home-assistant-and-pihole-in-secondary-network)
 - [History](#history)
 
-## server.home
+## Penta-GPU server
 
 This machine runs only when started manually, and is switched off most of the time. It's more a playground to see what's possible with local LLMs due to its 3 GPUs and 22 GB of fast VRAM. Other specifications:
 
@@ -19,14 +19,19 @@ This machine runs only when started manually, and is switched off most of the ti
 - RAM: 32 GB DDR4 2400 (early 2026 reduced to 16 GB)
 - GPU: all NVIDIA
   - P104-100 8GB GDDR5X [314 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 5005 MHz PCIe 1.0 x4
-  - GTX 1070 8GB GDDR5  [220 GB/s](https://kreier.github.io/benchmark/gpu/) 3802 MHz PCIe 3.0 x16
-  - P106-100 6GB GDDR5  [176 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 4006 MHz PCIe 1.0 x16
+  - GTX 1070 8GB GDDR5  [220 GB/s](https://kreier.github.io/benchmark/gpu/) 3802 MHz PCIe 3.0 x16 (x8 on the mainmoard)
+  - P106-100 6GB GDDR5  [176 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 4006 MHz PCIe 1.0 x16 (x8 on the mainmoard)
+  - P104-100 8GB GDDR5X [314 GB/s](https://kreier.github.io/benchmark/gpu/opencl/) 5005 MHz PCIe 1.0 x4
 - NVMe: 256 Toshiba PCIe 4.0 x4
 - SSD: 240 Kingston SATA3 for the models of LLM used by Ollama
 
 This image shows the 47 layers of [glm-4.7-flash](https://ollama.com/library/glm-4.7-flash):q4_K_M using 19 of the 22 GB VRAM. Each GPU has about 1 GB headroom for the K-V-pairs related to their layers when doing inference over longer context. An update of the tested maximum context length follows. 2026-02-05
 
 ![nvtop 3x GPU](docs/assets/2026-01-27nvtop.jpeg)
+
+One week later with 53 layers from [nemotron-3-nano](https://ollama.com/library/nemotron-3-nano) and **31.6B** parameter the power of the CPU spikes to more than 400 Watt:
+
+![nvtop 5x GPU](docs/assets/2026-02-19_ollama_nemotron2.png)
 
 ### Software
 
@@ -158,9 +163,10 @@ The GTX 1060 has a broken HDMI port, but I still can use the 3 DP to connect a d
 | GTX 1060 |  120  |       |  192 |
 | GTX 1070 |       |  150  |  256 |
 | P104-100 |       |  180  |  320 |
-| total    |  560  |  450  |      |
+| P104-100 |       |  180  |  320 |
+| total    |  560  |  630  |      |
 
-### 2026
+### January 2026
 
 With more time in training models the available modesl also get significantly better. Now I can use a [19GB glm-4.7-flash](https://ollama.com/library/glm-4.7-flash) that DOES fit into the **22 GB VRAM,** distributed over my 3 GPUs (all 47 layers). The speed should now be 17.2 token/s if we use a linear approach (or 12 resp. 10 for the slower 1070 and P106). Effectively I get 23 token/s in Open WebUI, probably due to being a MoE model to effectively double the speed again (see my insight on [speculative execution](https://kreier.github.io/ml/#faster-inference-with-speculative-execution) from 2024-11-27)
 
@@ -178,11 +184,36 @@ There are a few models that fit into the 22 GB:
 - 17 GB [translategemma:27b](https://ollama.com/library/translategemma) for 55 languages, maybe [timeline project](https://github.com/kreier/timeline)?
 - 20 GB [qwen3-vl:30b](https://ollama.com/library/qwen3-vl) vision-language model in the Qwen family
 
-A short chat wit Gemini revealed that to fully use the context window of 198K one need 40.5 GB VRAM, even though the model weights are only 15 GB. That's because the KV Cache needs 0.12 GB per 1k tokens in the MLA architecture. Maybe I should investigate that with a few longer text documents, since my available VRAM has been reduced by 4 GB in 2026, while also reducing the power consumption from 560W to 450W. The last GPU was only connected PCIe 1.0 x1 anyway (0.25 GB/s vs. 16 GB/s for 3.0 x16).
+A short chat wit Gemini revealed that to fully use the context window of 198K one need 40.5 GB VRAM, even though the model weights are only 15 GB. That's because the KV Cache needs 0.12 GB per 1k tokens in the MLA architecture. Maybe I should investigate that with a few longer text documents, since my available VRAM has been reduced by 4 GB in 2026, while also reducing the power consumption from 560W to 450W. (This will change in February, another P104-100 is added). The last GPU was only connected PCIe 1.0 x1 anyway (0.25 GB/s vs. 16 GB/s for 3.0 x16).
 
 | year |    GPU   |  RAM  | GB/s |
 |:----:|:--------:|:-----:|:----:|
 | 2023 |    M1    |  8 GB |   68 |
 | 2024 |  3070 Ti |  8 GB |  608 |
 | 2025 | P106-100 | 26 GB |  192 |
-| 2026 | P104-100 | 22 GB |  320 |
+| 2026 | P104-100 | 30 GB |  320 |
+
+### February 2026
+
+This repository was renamed from Homeserver to Homelab, since more than just the server play a role here. Within a month the network expanded, and the server got a fourth GPU and 8GB of GDDR5X RAM. Now even larger models run, and all without a riser card. Unfortunately it also lost 16 GB of RAM. But maybe in 2027 it can get 16 GB DDR4 2667 back. And a CPU upgrade to a 7600K and an attempted 5 GHz frequency. Let's see. Now we can use more models in ollama with 30 GB VRAM:
+
+- [Qwen2.5:32b](https://ollama.com/library/qwen2.5) with 32.8B parameter and 20.4 GB memory required.
+- [nemotron-3-nano](https://ollama.com/library/nemotron-3-nano) with and 24 GB required.
+
+I got the H61 and H81 mainboards repaired for 100k VND each. Some filter capacitors were broken, they run fine again. And the P106-100 could not be fixed. But placed inside the G2030 it started working again and performed the OpenCL Benchmark without problems! Microfracture on the mainboard? Replaced thermal paste? Anyway, it works again.
+
+In January 2025 I tried [Qwen2.5:32b](https://ollama.com/library/qwen2.5) with 32.76B parameters and its 65 layers of 20 GB to fit into my 26 GB VRAM (8/6/6/6) machine. With 32 GB DDR4 I could run about **0.92 t/s** from the CPU, limited by the memory bandwidth of about 32 GB/s. But I **could not** get the layers split and load into VRAM successfully. See [ollama_multi_GPU.csv](https://github.com/kreier/benchmark/blob/main/llm/ollama_multi_GPU.csv). With **3 GPUs** (8/6/6) and 20 GB VRAM I could offload 80% to the GPU and got 21/14/15 layers there. The speed increased to 2.34 token/s. With a fourth GPU (8/6/6/6) I could get 98% of layers to the GPU: 19/15/15/15 and increased the inference to 5.11 token/s. **Why not 100%?** Just one more layer, you got already 21 into the 8GB GPU earlier! Well, I even commented on ollama Github about similar problems ([#7509 of ollama](https://github.com/ollama/ollama/issues/7509#issuecomment-2585521606) and I think in the time since then it has been fixed.) With the parameter `num_gpu=65` I got all layers offloaded, but also had an unstable system and **6.37 t/s**. Retest in 2026 with 30 GB of VRAM (8/8/8/6) and the layers are easily offloaded 18/18/18/11 and the inference is up to **8.42 token/s**. About 10x as fast as the CPU, with memory up to 320 GB/s on GDDR5X.
+
+A comparable model in size in 2026 is now available with [nemotron-3-nano](https://ollama.com/library/nemotron-3-nano) with 31.6B parameters, 53 layers and 24 GB model size. The context window is no longer just 32K but 1M! Now more MoE models are available, and the general speed has further increased for the same hardware, while the quality of the models also improved. Even though the memory footprint is 4GB larger the model is significantly faster! I get 38 t/s instead of just 8, almost 5x the speed because of MoE. And the answer is also much more sophisticated. Here a few more details of the comparison:
+
+|                                 model                              | size | parameter | context | token/s | prompt | GPUs | layer |
+|--------------------------------------------------------------------|-----:|:---------:|--------:|:-------:|:------:|:----:|:-----:|
+| [qwen2.5:32b](https://ollama.com/library/qwen2.5)                  | 20GB |   32.8B   |     32K |       8 |     75 |    4 |    65 |
+| [qwen3:32b](https://ollama.com/library/qwen3)                      | 20GB |   32.8B   |     40K |       8 |     52 |    3 |    65 |
+| [gemma3:27b](https://ollama.com/library/gemma3)                    | 17GB |   27.4B   |    128K |       9 |     50 |    3 |    63 |
+| [glm-4.7-flash:q4_K_M](https://ollama.com/library/glm-4.7-flash)   | 19GB |   29.9B   |    198K |      25 |     81 |    3 |    48 |
+| [nemotron-3-nano:30b](https://ollama.com/library/nemotron-3-nano)  | 24GB |   31.6B   |   1000K |      38 |    116 |    4 |    53 |
+| [gpt-oss:20b](https://ollama.com/library/gpt-oss)                  | 14GB |   20.9B   |    128K |      42 |    238 |    2 |    25 |
+| [gemma3:4b](https://ollama.com/library/gemma3)                     |  4GB |    4.3B   |    128K |      45 |    322 |    1 |    35 |
+
+Surprisingly the largest model in this 30B class is also the fastest: nemotron-3-nano. With its MoE architecture it rivals much smaller 20B and 4B models! All that on 10 year old hardware.
