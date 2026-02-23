@@ -1,0 +1,27 @@
+pgrep -af idle
+
+systemctl status gpu-idle-suspend.service
+journalctl -u gpu-idle-suspend.service -f
+
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl restart gpu-idle-suspend
+
+sudo systemctl stop gpu-idle-suspend
+sudo systemctl disable gpu-idle-suspend
+
+sudo nano /etc/systemd/system/gpu-idle-suspend.service
+
+
+And therein we have:
+
+[Unit]
+Description=GPU Idle Suspend Watcher
+After=network.target
+
+[Service]
+ExecStart=/home/mk/check_gpu_idle.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
