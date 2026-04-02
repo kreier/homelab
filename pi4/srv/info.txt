@@ -1,0 +1,34 @@
+This is the plan for this machine:
+
+## Available from the web:
+
+https://pi4.hv.io.vn            Landing page port 443, 80 is forwarded. Done by reverse proxy and Cloudflare
+https://pi4.hv.io.vn/dashboard  Uptime and load
+https://hofkoh.hv.io.vn         WordPress copy of hofkoh.de (to be deleted)
+
+
+## Available inside:
+
+https://pi4.hv.io.vn/admin      Pihole
+https://portainer.pi4.hv.io.vn  Portainer Docker manage interface
+https://grafana.pi4.hv.io.vn    Dashboard for use of the Pi 4
+https://wp.pi4.hv.io.vn         General WordPress installation
+http://ha.home:8123/lovelace/0
+
+## Other Docker container:
+- traefik
+- homeassistant
+
+## All Docker container:
+- traefik       	since 2026/02/03
+- pihole        	since 2026/02/03
+- wordpress		since 2026/02/03
+- homeassistant		since 2026/02/03
+
+- grafana
+- hofkoh
+- portainer
+
+## Update history
+
+2026/04/02 File created, documented 4 docker container
